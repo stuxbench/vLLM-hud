@@ -1,5 +1,3 @@
-- server.py slightly modified to work with the test grader - examples at test_grader.py, test_run.py, and test_task.json
-
 Running
 
 - have docker and uv installed, then clone repo and run uv sync, after they're installed cd into the folder and activate the venv

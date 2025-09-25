@@ -20,7 +20,7 @@ class TestFieldGrader(Grader):
     def compute_score(
         cls,
         state: EnvironmentState,
-        working_dir: str = "/build/vllm"
+        working_dir: str = "/workspace/vllm"
     ) -> tuple[float, dict]:
         """
         Check if 'TestField': '.test_field:test_value' was added to
@@ -114,7 +114,7 @@ class TestFieldGrader(Grader):
 
 def test_grading(
     state: EnvironmentState,
-    working_dir: str = "/build/vllm"
+    working_dir: str = "/workspace/vllm"
 ) -> Grade:
     """
     Grade the test task and check if TestField was added to MODULE_ATTRS.

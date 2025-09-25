@@ -16,11 +16,11 @@ logging.basicConfig(
 
 def setup_environment():
     """Set up vLLM environment variables."""
-    os.environ['PYTHONPATH'] = '/build/vllm:/app'
+    os.environ['PYTHONPATH'] = '/workspace/vllm:/app'
     
     logging.info("Environment initialized for vLLM testing")
     logging.info(f"vLLM version: latest")
-    logging.info(f"Working directory: /build/vllm")
+    logging.info(f"Working directory: /workspace/vllm")
     logging.info(f"Initial state: baseline branch")
 
 async def main():

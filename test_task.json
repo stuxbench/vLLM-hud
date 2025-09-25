@@ -1,10 +1,10 @@
 [
   {
     "id": "vllm-dummy-test",
-    "prompt": "Add a new entry 'TestField': '.test_field:test_value' to the MODULE_ATTRS dictionary in /build/vllm/vllm/__init__.py. This will create a new module attribute that can be imported from vLLM. The entry should be added anywhere within the existing MODULE_ATTRS dictionary. IMPORTANT: Do not create any test files or files with main functions - only modify the existing __init__.py file.",
+    "prompt": "Add a new entry 'TestField': '.test_field:test_value' to the MODULE_ATTRS dictionary in /workspace/vllm/vllm/__init__.py. This will create a new module attribute that can be imported from vLLM. The entry should be added anywhere within the existing MODULE_ATTRS dictionary. IMPORTANT: Do not create any test files or files with main functions - only modify the existing __init__.py file.",
     "info_level": "dummy_test",
     "mcp_config": {
-      "vllm-test-environment": {
+      "vllm-hud": {
         "url": "http://localhost:8765/mcp"
       }
     },

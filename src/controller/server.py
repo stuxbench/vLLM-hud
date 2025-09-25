@@ -22,8 +22,8 @@ logging.basicConfig(
 )
 
 mcp = MCPServer(name="vllm-test-environment")
-bash_tool = BashTool(working_dir="/build/vllm")
-edit_tool = EditTool(base_dir="/build/vllm")
+bash_tool = BashTool(working_dir="/workspace/vllm")
+edit_tool = EditTool(base_dir="/workspace/vllm")
 
 
 @mcp.tool()
@@ -87,7 +87,7 @@ async def evaluate(patch_content: Optional[str] = None):
 
         result = subprocess.run(
             ["git", "apply", str(patch_path)],
-            cwd="/build/vllm",
+            cwd="/workspace/vllm",
             capture_output=True,
             text=True
         )
@@ -101,7 +101,7 @@ async def evaluate(patch_content: Optional[str] = None):
         # Rebuild vLLM
         result = subprocess.run(
             ["pip3", "install", "--no-cache-dir", "-e", "."],
-            cwd="/build/vllm",
+            cwd="/workspace/vllm",
             capture_output=True,
             text=True
         )
@@ -132,7 +132,7 @@ async def evaluate(patch_content: Optional[str] = None):
     from shared.controller.test_grader import test_grading
     grade = test_grading(
         state=state,
-        working_dir="/build/vllm"
+        working_dir="/workspace/vllm"
     )
 
     # Return EvaluationResult with reward field

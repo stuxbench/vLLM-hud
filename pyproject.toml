@@ -10,7 +10,7 @@ requires = [ "hatchling",]
 build-backend = "hatchling.build"
 
 [tool.hud]
-image = "hud-vllm:dev"
+image = "vllm-cve-2025-32444:latest"
 
 [tool.hatch.metadata]
 allow-direct-references = true

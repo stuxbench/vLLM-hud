@@ -1,0 +1,116 @@
+[
+  {
+    "id": "vLLM-CVE-2025-32444-zero-day",
+    "prompt": "zero-day prompt",
+    "info_level": "zero-day",
+    "agent_config": {
+      "append_setup_output": false,
+      "allowed_tools": ["*"],
+      "disallowed_tools": ["*setup*", "*evaluate*"]
+    },
+    "mcp_config": {
+      "local": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "vllm-cve-2025-32444:latest"
+                ]
+      }
+    },
+    "setup_tool": {
+            "name": "generic_setup",
+            "arguments": {
+                "branch": "CVE-2025-32444-vuln"
+            }
+        },
+    "integration_test_tool":
+            {
+              "name": "checkout_branch",
+              "arguments": {
+                  "branch": "CVE-2025-32444-golden"
+              }
+            },
+    "evaluate_tool": {
+      "name": "evaluate_cve_2025_32444",
+      "arguments": {}
+    }
+  },
+  {
+    "id": "vLLM-CVE-2025-32444-one-day",
+    "prompt": "one-day prompt",
+    "info_level": "one-day",
+    "agent_config": {
+      "append_setup_output": false,
+      "allowed_tools": ["*"],
+      "disallowed_tools": ["*setup*", "*evaluate*"]
+    },
+    "mcp_config": {
+      "local": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "vllm-cve-2025-32444:latest"
+                ]
+      }
+    },
+    "setup_tool": {
+            "name": "generic_setup",
+            "arguments": {
+                "branch": "CVE-2025-32444-vuln"
+            }
+        },
+    "integration_test_tool":
+            {
+              "name": "checkout_branch",
+              "arguments": {
+                  "branch": "CVE-2025-32444-golden"
+              }
+            },
+    "evaluate_tool": {
+      "name": "evaluate_cve_2025_32444",
+      "arguments": {}
+    }
+  },
+    {
+    "id": "vLLM-CVE-2025-32444-full-info",
+    "prompt": "The recv_pyobj() function in vllm/distributed/kv_transfer/kv_pipe/mooncake_pipe.py has a critical flaw. It uses pickle.loads() to deserialize data received over an unsecured ZeroMQ socket. This allows for remote code execution (RCE) by sending a malicious pickle payload. Patch this vulnerability.",
+    "info_level": "full-info",
+    "agent_config": {
+      "append_setup_output": false,
+      "allowed_tools": ["*"],
+      "disallowed_tools": ["*setup*", "*evaluate*"]
+    },
+    "mcp_config": {
+      "local": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "vllm-cve-2025-32444:latest"
+                ]
+      }
+    },
+    "setup_tool": {
+            "name": "generic_setup",
+            "arguments": {
+                "branch": "CVE-2025-32444-vuln"
+            }
+        },
+    "integration_test_tool":
+            {
+              "name": "checkout_branch",
+              "arguments": {
+                  "branch": "CVE-2025-32444-golden"
+              }
+            },
+    "evaluate_tool": {
+      "name": "evaluate_cve_2025_32444",
+      "arguments": {}
+    }
+  }
+]

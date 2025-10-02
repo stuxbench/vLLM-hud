@@ -59,6 +59,8 @@ ENV VLLM_CPU_AVX512BF16=${VLLM_CPU_AVX512BF16}
 ARG VLLM_CPU_AVX512VNNI=0
 ENV VLLM_CPU_AVX512VNNI=${VLLM_CPU_AVX512VNNI}
 
+# Commit hash of v0.8.4, most recent vuln version of vLLM for CVE-2025-32444
+ARG RECENT_VULN_COMMIT=dc1b4a6f1300003ae27f033afbdff5e2683721ce
 # Clone vllm repository with GitHub credentials
 # ENV GITHUB_TOKEN_BASE64="place personal github token here"
 # ENV GITHUB_USERNAME="place github username here"
@@ -74,32 +76,20 @@ ENV UV_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cpu"
 ENV UV_INDEX_STRATEGY="unsafe-best-match"
 ENV UV_LINK_MODE="copy"
 
-# Install build dependencies
+RUN git checkout $RECENT_VULN_COMMIT
+
+# --- CHANGE: Switched to requirements directory to ensure relative paths in files resolve correctly ---
+WORKDIR /workspace/vllm/requirements
+
+# Install reqs, no triton for CPU-only build (not needed + errors otherwise)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --upgrade pip wheel setuptools setuptools-scm cmake ninja packaging torch==2.8.0 jinja2
+    uv pip install --upgrade pip && \
+    uv pip install -r common.txt && \
+    uv pip install -r build.txt && \
+    grep -v 'triton' cpu.txt | uv pip install -r -
 
-# Checkout branches and create patches (commented for now)
-ARG VULN_BRANCH=baseline
-# RUN git checkout $VULN_BRANCH
-
-ARG TEST_BRANCH=test
-ARG GOLDEN_BRANCH=golden  
-# RUN git checkout $TEST_BRANCH
-# RUN git checkout $GOLDEN_BRANCH
-
-# Create test patch (adds the test back to vulnerable code)
-# RUN mkdir -p /home/root
-# RUN git diff $VULN_BRANCH $GOLDEN_BRANCH > /home/root/test.patch
-# RUN chmod 600 /home/root/test.patch
-
-# Go back to baseline state (vulnerable state without tests)
-# RUN git checkout $VULN_BRANCH
-# RUN rm -rf .git
-# RUN git init && \
-#     git config --global user.email "test@example.com" && \
-#     git config --global user.name "Test User"
-# RUN git add .
-# RUN git commit -m "Initial commit"
+# --- CHANGE: Return to the repo root for the build command ---
+WORKDIR /workspace/vllm
 
 # Build vLLM for CPU (limit parallel jobs to reduce memory usage)
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -115,23 +105,26 @@ WORKDIR /app
 # Copy vLLM source code -- only needed for current trivial task
 COPY --from=vllm-build /workspace/vllm /workspace/vllm
 
-# Install vLLM from build stage
+# Install vLLM from build stage; no deps to avoid triton issues
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,from=vllm-build,src=/workspace/vllm/dist,target=dist \
-    uv pip install dist/*.whl
+    uv pip install --no-deps dist/*.whl
 
-# Install additional testing dependencies  
+# Install additional testing dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install pytest mcp hud-python
 
-# Copy MCP server code and shared utilities
-COPY src/ /app/src/
-COPY shared/ /app/shared/
+# --- CHANGE: Optimized layer caching for application dependencies ---
+# 1. Copy only the dependency manifest first
 COPY pyproject.toml /app/pyproject.toml
 
-# Install MCP server dependencies
+# 2. Install dependencies. This layer is now cached and only reruns if pyproject.toml changes.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install -e .
+    uv pip install .
+
+# 3. Copy the application source code last, as it changes most frequently
+COPY src/ /app/src/
+COPY shared/ /app/shared/
 
 # Start services
 CMD ["sh", "-c", "python3 -m src.controller.env & sleep 2 && exec python3 -m src.controller.server"]

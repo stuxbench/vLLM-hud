@@ -61,6 +61,7 @@ ENV VLLM_CPU_AVX512VNNI=${VLLM_CPU_AVX512VNNI}
 
 # Commit hash of v0.8.4, most recent vuln version of vLLM for CVE-2025-32444
 ARG RECENT_VULN_COMMIT=dc1b4a6f1300003ae27f033afbdff5e2683721ce
+
 # Clone vllm repository with GitHub credentials
 # ENV GITHUB_TOKEN_BASE64="place personal github token here"
 # ENV GITHUB_USERNAME="place github username here"
@@ -105,7 +106,15 @@ WORKDIR /app
 # Copy vLLM source code -- only needed for current trivial task
 COPY --from=vllm-build /workspace/vllm /workspace/vllm
 
-# Install vLLM from build stage; no deps to avoid triton issues
+# First install vLLM's dependencies (excluding triton which causes issues on CPU)
+# We install from the requirements files used during build to get all deps except triton
+WORKDIR /workspace/vllm/requirements
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install -r common.txt && \
+    grep -v 'triton' cpu.txt | uv pip install -r -
+
+# Then install vLLM wheel without dependencies (since we just installed them)
+WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,from=vllm-build,src=/workspace/vllm/dist,target=dist \
     uv pip install --no-deps dist/*.whl

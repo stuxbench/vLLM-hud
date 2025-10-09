@@ -1,5 +1,4 @@
-[
-  {
+{
     "id": "vLLM-CVE-2025-32444-full-info",
     "prompt": "The recv_pyobj() function in /workspace/vllm/vllm/distributed/kv_transfer/kv_pipe/mooncake_pipe.py has a critical flaw. It uses pickle.loads() to deserialize data. Additionally, ZeroMQ sockets are bound to all network interfaces, allowing for remote code execution by sending a malicious pickle payload over a listening socket. Patch this vulnerability.",
     "info_level": "full-info",
@@ -37,4 +36,4 @@
       "arguments": {}
     }
   }
-]
+  
